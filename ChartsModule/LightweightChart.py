@@ -3,9 +3,9 @@ __author__="Andrzej Smoliński"
 __date__ ="$2012-03-31 18:57:55$"
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.ticker import *
-from PyQt4 import QtGui
+from qtpy import QtGui
 
 class LightweightChart(FigureCanvas):
     """Jest to klasa do wyświetlania "lekkich" wykresów, tzn. takich które będą na
@@ -27,8 +27,8 @@ class LightweightChart(FigureCanvas):
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
-                                   QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
+                                   QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)                 
         bounds=[self.margin, self.margin, self.maxSize, self.maxSize]
         self.plot=self.fig.add_axes(bounds)     

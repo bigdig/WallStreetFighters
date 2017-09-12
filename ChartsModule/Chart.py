@@ -6,13 +6,13 @@ from ChartData import ChartData
 from matplotlib.collections import LineCollection
 from matplotlib.collections import PatchCollection
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.finance import candlestick
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+# from matplotlib.finance import candlestick
 from matplotlib.ticker import *
 from matplotlib.textpath import TextPath
 from matplotlib.text import Text
 from numpy import *
-from PyQt4 import QtGui
+from qtpy import QtGui
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from TechAnalysisModule.candles import *
@@ -52,8 +52,8 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
         FigureCanvas.__init__(self, self.fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
-                                   QtGui.QSizePolicy.Expanding,
-                                   QtGui.QSizePolicy.Expanding)
+                                   QtWidgets.QSizePolicy.Expanding,
+                                   QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
         self.addMainPlot()
         self.addVolumeBars()

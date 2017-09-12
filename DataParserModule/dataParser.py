@@ -561,7 +561,9 @@ def loadData():
 		NASDAQ_HIST += [[parserStringToDate(row[0][0:4:1]+'-'+row[0][4:6:1]+'-'+row[0][6:8:1]),row[1],row[2],row[3],row[4],row[5],row[6]]]
 	csvFile  = open('NYSE.csv', "rb")
 	dataCsv = csv.reader(csvFile)
+	print(dataCsv)
 	for row in dataCsv:
+		print(row.__dict__)
 		NYSE_HIST += [[parserStringToDate(row[0][0:4:1]+'-'+row[0][4:6:1]+'-'+row[0][6:8:1]),row[1],row[2],row[3],row[4],row[5],row[6]]]
 	#loadHistory()
 

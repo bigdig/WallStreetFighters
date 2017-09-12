@@ -1,32 +1,32 @@
 # -*- coding: utf-8 -*-
-from PyQt4 import QtCore, QtGui
+from qtpy import QtCore, QtGui, QtWidgets
 import DataParserModule.dataParser as dataParser
 from ChartsModule.LightweightChart import *
 import datetime
 import TechAnalysisModule.oscilators as indicators
 import time
 
-class Home (QtGui.QWidget):
+class Home (QtWidgets.QWidget):
     def __init__(self,topList = None,mostList = None,gainerList = None, loserList = None, finObjList = None):
         self.topList = topList
         self.mostList = mostList
         self.loserList = loserList
         self.gainerList = gainerList
-	self.finObjList = finObjList
-	self.updateThread = UpdateThread(self.finObjList)
-	self.connect(self.updateThread, QtCore.SIGNAL("Update"), self.updateHome)
-        QtGui.QWidget.__init__(self)
+        self.finObjList = finObjList
+        self.updateThread = UpdateThread(self.finObjList)
+        self.connect(self.updateThread, QtCore.SIGNAL("Update"), self.updateHome)
+        QtWidgets.QWidget.__init__(self)
         self.initUi()
     def initUi(self):
-        self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self)
         #ramka zawierajaca obiekty z góry yahoo 
-        self.topFrame = QtGui.QFrame(self)
+        self.topFrame = QtWidgets.QFrame(self)
         self.topFrame.setMaximumSize(QtCore.QSize(16777215, 320))
         self.topFrame.setMinimumSize(QtCore.QSize(0, 320))
-        self.topFrame.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.topFrame.setFrameShadow(QtGui.QFrame.Raised)
-        self.topLayout = QtGui.QGridLayout(self.topFrame)
-        #spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.topFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.topFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.topLayout = QtWidgets.QGridLayout(self.topFrame)
+        #spacerItem = QtGui.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         #self.topLayout.addItem(spacerItem)
         k = 0
         if self.topList:
@@ -36,7 +36,7 @@ class Home (QtGui.QWidget):
 
 
         
-        #spacerItem1 = QtGui.QSpacerItem(39, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        #spacerItem1 = QtGui.QSpacerItem(39, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         #self.topLayout.addItem(spacerItem1)
         self.gridLayout.addWidget(self.topFrame, 0, 1, 1, 1)
         #koniec top ramki
@@ -46,8 +46,8 @@ class Home (QtGui.QWidget):
        
 
         #ramka zawierajaca Most Activities, Gainers i Losers
-        self.scrollArea = QtGui.QScrollArea(self)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Expanding)
+        self.scrollArea = QtWidgets.QScrollArea(self)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.scrollArea.sizePolicy().hasHeightForWidth())
@@ -55,20 +55,20 @@ class Home (QtGui.QWidget):
         self.scrollArea.setMinimumSize(QtCore.QSize(255, 0))
         self.scrollArea.setMaximumSize(QtCore.QSize(255, 16777215))
         self.scrollArea.setWidgetResizable(True)
-        self.leftFrame = QtGui.QWidget()
-        self.leftLayout = QtGui.QVBoxLayout(self.leftFrame)
+        self.leftFrame = QtWidgets.QWidget()
+        self.leftLayout = QtWidgets.QVBoxLayout(self.leftFrame)
         
-        self.label1 = QtGui.QLabel("Most Activities",self.leftFrame)
+        self.label1 = QtWidgets.QLabel("Most Activities",self.leftFrame)
         self.leftLayout.addWidget(self.label1)
         self.addTable(self.mostList)
-        self.label2 = QtGui.QLabel("Gainers",self.leftFrame)
+        self.label2 = QtWidgets.QLabel("Gainers",self.leftFrame)
         self.leftLayout.addWidget(self.label2)
         self.addTable(self.gainerList)
-        self.label3= QtGui.QLabel("Losers",self.leftFrame)
+        self.label3= QtWidgets.QLabel("Losers",self.leftFrame)
         self.leftLayout.addWidget(self.label3)
         self.addTable(self.loserList)
         
-        #spacerItem2 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
+        #spacerItem2 = QtGui.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         #self.leftLayout.addItem(spacerItem2)
         self.scrollArea.setWidget(self.leftFrame)
         self.gridLayout.addWidget(self.scrollArea, 0, 0, 2, 1)
@@ -78,40 +78,40 @@ class Home (QtGui.QWidget):
 
 
         #rssLayout
-        self.rssFrame = QtGui.QFrame(self)
+        self.rssFrame = QtWidgets.QFrame(self)
         self.rssFrame.setAutoFillBackground(True)
-        self.rssFrame.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.rssFrame.setFrameShadow(QtGui.QFrame.Raised)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
+        self.rssFrame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.rssFrame.setFrameShadow(QtWidgets.QFrame.Raised)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.rssFrame.sizePolicy().hasHeightForWidth())
         self.rssFrame.setSizePolicy(sizePolicy)
-        self.rssLayout = QtGui.QHBoxLayout(self.rssFrame)
+        self.rssLayout = QtWidgets.QHBoxLayout(self.rssFrame)
         self.gridLayout.addWidget(self.rssFrame, 1, 1, 1, 1)
 
     def addTopObject(self,objList,k):
         self.frame = MyFrame(self)
-        self.frame.setFrameShape(QtGui.QFrame.StyledPanel)
-        self.frame.setFrameShadow(QtGui.QFrame.Raised)
+        self.frame.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame.setMaximumSize(QtCore.QSize(100, 100))
         self.frame.setMinimumSize(QtCore.QSize(100, 100))
-        verticalLayout = QtGui.QVBoxLayout(self.frame)
-        self.frame.nameLabel = QtGui.QLabel(self.frame)
+        verticalLayout = QtWidgets.QVBoxLayout(self.frame)
+        self.frame.nameLabel = QtWidgets.QLabel(self.frame)
         self.frame.nameLabel.setText(objList[0])
         self.frame.nameLabel.setStyleSheet('QLabel {color: blue}')
         verticalLayout.addWidget(self.frame.nameLabel)
-        prizeLabel = QtGui.QLabel(self.frame)
+        prizeLabel = QtWidgets.QLabel(self.frame)
         prizeLabel.setText(objList[1])
         verticalLayout.addWidget(prizeLabel)
-        changeLabel = QtGui.QLabel(self.frame)
+        changeLabel = QtWidgets.QLabel(self.frame)
         if objList[2][0] == '-':
             changeLabel.setStyleSheet('QLabel {color: red}')
         else:
             changeLabel.setStyleSheet('QLabel {color: green}')
         changeLabel.setText(objList[2])
         verticalLayout.addWidget(changeLabel)
-        precentLabel = QtGui.QLabel(self.frame)
+        precentLabel = QtWidgets.QLabel(self.frame)
         if objList[3][0] == '-':
             precentLabel.setStyleSheet('QLabel {color: red}')
         else:
@@ -136,9 +136,9 @@ class Home (QtGui.QWidget):
         
                                   
     def addTable(self,objList2):
-        self.tableWidget = QtGui.QTableWidget(self)
+        self.tableWidget = QtWidgets.QTableWidget(self)
         self.tableWidget.setEnabled(True)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Preferred, QtGui.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
@@ -152,28 +152,28 @@ class Home (QtGui.QWidget):
         self.tableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tableWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tableWidget.setAutoScroll(False)
-        self.tableWidget.setEditTriggers(QtGui.QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tableWidget.setProperty("showDropIndicator", False)
         self.tableWidget.setDragDropOverwriteMode(False)
         self.tableWidget.setAlternatingRowColors(True)
-        self.tableWidget.setSelectionMode(QtGui.QAbstractItemView.NoSelection)
+        self.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.tableWidget.setShowGrid(False)
         self.tableWidget.setWordWrap(True)
         self.tableWidget.setCornerButtonEnabled(True)
         self.tableWidget.setRowCount(5)
         self.tableWidget.setColumnCount(3)
-        item = QtGui.QTableWidgetItem("Name")
+        item = QtWidgets.QTableWidgetItem("Name")
         self.tableWidget.setHorizontalHeaderItem(0, item)
-        item = QtGui.QTableWidgetItem("Prize")
+        item = QtWidgets.QTableWidgetItem("Prize")
         self.tableWidget.setHorizontalHeaderItem(1, item)
-        #item = QtGui.QTableWidgetItem('Change')
+        #item = QtWidgets.QTableWidgetItem('Change')
         #self.tableWidget.setHorizontalHeaderItem(2, item)
-        item = QtGui.QTableWidgetItem('%Chg')
+        item = QtWidgets.QTableWidgetItem('%Chg')
         self.tableWidget.setHorizontalHeaderItem(2, item)
         k = 0
         if objList2:
             for objList in objList2:
-                item = QtGui.QTableWidgetItem(objList[0])
+                item = QtWidgets.QTableWidgetItem(objList[0])
                 brush = QtGui.QBrush(QtGui.QColor(0, 0, 255))
                 brush.setStyle(QtCore.Qt.NoBrush)
                 item.setBackground(brush)
@@ -182,11 +182,11 @@ class Home (QtGui.QWidget):
                 item.setForeground(brush)
                 self.tableWidget.setItem(k, 0, item)
                 #Prize
-                item = QtGui.QTableWidgetItem(objList[1])
+                item = QtWidgets.QTableWidgetItem(objList[1])
                 item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
                 self.tableWidget.setItem(k, 1, item)
                 #Change
-                #item = QtGui.QTableWidgetItem(objList[2])
+                #item = QtWidgets.QTableWidgetItem(objList[2])
                 #item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
                 #if objList[2][0] =='-':
                     #brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
@@ -197,7 +197,7 @@ class Home (QtGui.QWidget):
                 #item.setFlags(QtCore.Qt.ItemIsDragEnabled|QtCore.Qt.ItemIsUserCheckable|QtCore.Qt.ItemIsEnabled)
                 #self.tableWidget.setItem(k, 2, item)
                 #%chg
-                item = QtGui.QTableWidgetItem(objList[2])
+                item = QtWidgets.QTableWidgetItem(objList[2])
                 item.setTextAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignVCenter)
                 if objList[2][0] == '-':
                     brush = QtGui.QBrush(QtGui.QColor(255, 0, 0))
@@ -221,8 +221,8 @@ class Home (QtGui.QWidget):
      
     def updateTopList(self):
        
-	self.topList = self.updateThread.topList
-	self.finObjList = self.updateThread.finObjList
+        self.topList = self.updateThread.topList
+        self.finObjList = self.updateThread.finObjList
         #zamykamy wszystkie ramki
         ran = range(self.topLayout.count())
         for i in ran:
@@ -245,13 +245,13 @@ class Home (QtGui.QWidget):
         ran = range(self.leftLayout.count())
         for i in ran:
             self.leftLayout.itemAt(i).widget().close()
-        label1 = QtGui.QLabel("Most Activities",self.leftFrame)
+        label1 = QtWidgets.QLabel("Most Activities",self.leftFrame)
         self.leftLayout.addWidget(label1)
         self.addTable(self.mostList)
-        label2 = QtGui.QLabel("Gainers",self.leftFrame)
+        label2 = QtWidgets.QLabel("Gainers",self.leftFrame)
         self.leftLayout.addWidget(label2)
         self.addTable(self.gainerList)
-        label3= QtGui.QLabel("Losers",self.leftFrame)
+        label3= QtWidgets.QLabel("Losers",self.leftFrame)
         self.leftLayout.addWidget(label3)
         self.addTable(self.loserList)
 	
@@ -266,10 +266,10 @@ class Home (QtGui.QWidget):
         if a.column() ==0:
             self.emit(QtCore.SIGNAL("tabFromHome"),(a.text()))
             
-class MyFrame(QtGui.QFrame):
+class MyFrame(QtWidgets.QFrame):
     def __init__(self,parent):
         self.parent = parent
-        QtGui.QWidget.__init__(self)
+        QtWidgets.QWidget.__init__(self)
     def mouseDoubleClickEvent (self,event):
         if self.nameLabel.text() == "Dow":
             self.parent.emit(QtCore.SIGNAL("tabFromHome"),('^DJI'))

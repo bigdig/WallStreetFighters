@@ -3,7 +3,7 @@ __author__="Andrzej Smoliński"
 __date__ ="$2012-03-24 12:05:55$"
 
 import datetime
-import matplotlib.dates as mdates
+# import matplotlib.dates as mdates
 import numpy as np
 import TechAnalysisModule.oscilators as indicators
 import DataParserModule.dataParser as parser
@@ -25,7 +25,7 @@ class ChartData:
             self.corrupted=True
             return        
         self.step=(step)
-	self.fullArray=finObj.getArray(step)
+        self.fullArray=finObj.getArray(step)
         if(start==None):
             start=datetime.datetime.strptime(self.fullArray(step)['date'][0],"%Y-%m-%d")
         if(end==None):
@@ -52,7 +52,7 @@ class ChartData:
                 return
             #dane w formacie dla candlesticka
             self.quotes=[]
-	    a = datetime.datetime.now()
+            a = datetime.datetime.now()
             for i in range(len(dataArray)):
                 time=float(i)
                 open=self.open[i] 

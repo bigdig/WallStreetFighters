@@ -1,13 +1,13 @@
 import sys
 import os
-from PyQt4 import QtGui
+from qtpy import QtWidgets, QtGui, QtCore
 from mainGui import GuiMainWindow
 import DataParserModule.dataParser as dataParser
 import cPickle
 
-class MainWindow(QtGui.QMainWindow):
+class MainWindow(QtWidgets.QMainWindow):
     def __init__(self,parent=None):
-        QtGui.QWidget.__init__(self,parent)
+        QtWidgets.QWidget.__init__(self,parent)
         # obiekt Gui
         self.gui = GuiMainWindow()
         self.gui.setupGui(self)
@@ -40,14 +40,13 @@ class MainWindow(QtGui.QMainWindow):
                 self.showNormal()
 
 if __name__ == '__main__':
-    app = QtGui.QApplication(sys.argv)
-   
+    app = QtWidgets.QApplication(sys.argv)
     ex = MainWindow()
     ex.show()
     sys.exit(app.exec_())
-    print "ddd"
     while True:
         app.processEvents()
+
     
     
     

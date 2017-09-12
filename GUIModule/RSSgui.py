@@ -2,7 +2,7 @@
 import sys
 import os
 
-from PyQt4 import QtGui ,QtCore
+from qtpy import QtGui,QtCore,QtWidgets
 from RSS import *
 
 
@@ -11,9 +11,9 @@ class RSSSite:
     def __init__(self, Url=""):
         self.rssReader = RSSReader(Url)
         self.Name = self.rssReader.name
-class RSSWidget(QtGui.QWidget):
+class RSSWidget(QtWidgets.QWidget):
     def __init__(self,parent=None):
-        QtGui.QWidget.__init__(self,parent)
+        QtWidgets.QWidget.__init__(self,parent)
        
         self.initUi()
         self.rssSite = []
@@ -25,22 +25,22 @@ class RSSWidget(QtGui.QWidget):
         self.descriptionList = []
         self.showRSS()   
     def initUi(self):
-        self.gridLayout = QtGui.QGridLayout(self)
+        self.gridLayout = QtWidgets.QGridLayout(self)
 
         #przyciski
-        self.groupBox = QtGui.QGroupBox("Select site:",self)
+        self.groupBox = QtWidgets.QGroupBox("Select site:",self)
         self.groupBox.setMaximumSize(QtCore.QSize(300, 16777215))
         font = QtGui.QFont()
         font.setKerning(True)
         self.groupBox.setFont(font)
-        self.horizontalLayout = QtGui.QHBoxLayout(self.groupBox)
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.groupBox)
         self.horizontalLayout.setSpacing(2)
         self.horizontalLayout.setMargin(2)
-        self.addButton = QtGui.QPushButton("add",self.groupBox)
+        self.addButton = QtWidgets.QPushButton("add",self.groupBox)
         self.horizontalLayout.addWidget(self.addButton)
-        self.removeButton = QtGui.QPushButton("remove",self.groupBox)
+        self.removeButton = QtWidgets.QPushButton("remove",self.groupBox)
         self.horizontalLayout.addWidget(self.removeButton)
-        self.editButton= QtGui.QPushButton("edit",self.groupBox)
+        self.editButton= QtWidgets.QPushButton("edit",self.groupBox)
         self.horizontalLayout.addWidget(self.editButton)
         self.gridLayout.addWidget(self.groupBox, 0, 0, 1, 1)
 
@@ -48,17 +48,17 @@ class RSSWidget(QtGui.QWidget):
         self.gridLayout.setHorizontalSpacing(6)
         self.gridLayout.setVerticalSpacing(0)
 
-        self.rssList = QtGui.QListWidget(self)
+        self.rssList = QtWidgets.QListWidget(self)
         self.rssList.setMaximumSize(QtCore.QSize(450, 200))
         self.gridLayout.addWidget(self.rssList, 3, 0, 1, 3)
         
 
         # wyswietlanie artykułów
-        self.itemsLabel = QtGui.QLabel("Select Article:",self)
+        self.itemsLabel = QtWidgets.QLabel("Select Article:",self)
         self.gridLayout.addWidget(self.itemsLabel, 5, 0, 1, 1)
         
-        self.itemsList = QtGui.QListWidget(self)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.itemsList = QtWidgets.QListWidget(self)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(1)
         sizePolicy.setHeightForWidth(self.itemsList.sizePolicy().hasHeightForWidth())
@@ -71,9 +71,9 @@ class RSSWidget(QtGui.QWidget):
         self.gridLayout.addWidget(self.itemsList, 6, 0, 1, 3)
 
         # text browser
-        self.textBrowser = QtGui.QTextBrowser(self)
+        self.textBrowser = QtWidgets.QTextBrowser(self)
         self.textBrowser.setOpenExternalLinks(True)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.textBrowser.sizePolicy().hasHeightForWidth())
@@ -87,14 +87,14 @@ class RSSWidget(QtGui.QWidget):
         self.addButton.clicked.connect(self.addRSS)
         self.removeButton.clicked.connect(self.removeRSS)
     def addRSS(self):
-        text, ok = QtGui.QInputDialog.getText(self, 'Add RSS', 
+        text, ok = QtWidgets.QInputDialog.getText(self, 'Add RSS', 
             'Enter url:')
         
         if ok:
             self.rssFile.write((str(text))+'\n')
             rssReader = RSSSite(str(text))
             self.rssSite.append(rssReader)
-            item = QtGui.QListWidgetItem(rssReader.Name,self.rssList)
+            item = QtWidgets.QListWidgetItem(rssReader.Name,self.rssList)
             
             self.rssList.addItem(item)
     def removeRSS(self):
@@ -115,7 +115,7 @@ class RSSWidget(QtGui.QWidget):
     def showRSS(self):
             for site in self.rssSite:
                 if(site):
-                    item = QtGui.QListWidgetItem(site.Name,self.rssList)
+                    item = QtWidgets.QListWidgetItem(site.Name,self.rssList)
                     self.rssList.addItem(item)
 
         
@@ -132,7 +132,7 @@ class RSSWidget(QtGui.QWidget):
                 #desc += rssItem.link
                 #desc += "\" />"
                 self.descriptionList.append(desc)
-		item = QtGui.QListWidgetItem(rssItem.title,self.itemsList)
+		item = QtWidgets.QListWidgetItem(rssItem.title,self.itemsList)
 		self.itemsList.addItem(item)
 		
 		

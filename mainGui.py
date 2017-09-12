@@ -6,7 +6,7 @@ import operator
 import threading
 import time
 import os
-from PyQt4 import QtGui, QtCore
+from qtpy import QtGui, QtCore, QtWidgets
 from TabA import TabA
 import cPickle
 import GUIModule.RSSgui as RSSgui
@@ -23,71 +23,72 @@ class GuiMainWindow(object):
         """ustawianie komponetów GUI"""
         MainWindow.setObjectName("WallStreetFighters")
         MainWindow.resize(1000,700)
-        self.centralWidget = QtGui.QWidget(MainWindow)
+        self.centralWidget = QtWidgets.QWidget(MainWindow)
         self.centralWidget.setObjectName("centralWidget")
 
         #tabs - przechowywanie zakładek
-	self.verticalLayout = QtGui.QVBoxLayout(self.centralWidget)
-        self.tabs = QtGui.QTabWidget(self.centralWidget)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self.centralWidget)
+        self.tabs = QtWidgets.QTabWidget(self.centralWidget)
         self.tabs.setGeometry(QtCore.QRect(10, 10, 980, 640))
         self.tabs.setObjectName("Tabs")
         self.tabs.setTabsClosable(True)
 
         #załadowanie List
         os.chdir("../WallStreetFighters/DataParserModule")
-	try:
-        	dataParser.loadData()
-		FILE = open("../GUIModule/data.wsf", 'r')
-		dataParser.loadHistory(FILE).start()
-	except: 
-		pass
+        try:
+            dataParser.loadData()
+            FILE = open("../GUIModule/data.wsf", 'r')
+            dataParser.loadHistory(FILE).start()
+        except: 
+            pass
 
         # inicjujemy model danych dla Index
         self._indexModel = self.ListModel(list=dataParser.INDEX_LIST)
-        self.indexModel = QtGui.QSortFilterProxyModel()
+        self.indexModel = QtCore.QSortFilterProxyModel()
         self.indexModel.setSourceModel(self._indexModel)
         self.indexModel.setFilterCaseSensitivity(0)
         self.indexModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Stock
         self._stockModel = self.ListModel(list=dataParser.STOCK_LIST)
-        self.stockModel = QtGui.QSortFilterProxyModel()
+        self.stockModel = QtCore.QSortFilterProxyModel()
         self.stockModel.setSourceModel(self._stockModel)
         self.stockModelNestedPattern = ''
         self.stockModel.setFilterCaseSensitivity(0)
         self.stockModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Forex
         self._forexModel = self.ListModel(list=dataParser.FOREX_LIST)
-        self.forexModel = QtGui.QSortFilterProxyModel()
+        self.forexModel = QtCore.QSortFilterProxyModel()
         self.forexModel.setSourceModel(self._forexModel)
         self.forexModel.setFilterCaseSensitivity(0)
         self.forexModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Resources
         self._resourceModel = self.ListModel(list=dataParser.RESOURCE_LIST)
-        self.resourceModel = QtGui.QSortFilterProxyModel()
+        self.resourceModel = QtCore.QSortFilterProxyModel()
         self.resourceModel.setSourceModel(self._resourceModel)
         self.resourceModel.setFilterCaseSensitivity(0)
         self.resourceModel.setDynamicSortFilter(True)
         # inicjujemy model danych dla Bond
         self._bondModel = self.ListModel(list=dataParser.BOND_LIST)
-        self.bondModel = QtGui.QSortFilterProxyModel()
+        self.bondModel = QtCore.QSortFilterProxyModel()
         self.bondModel.setSourceModel(self._bondModel)
         self.bondModel.setFilterCaseSensitivity(0)
         self.bondModel.setDynamicSortFilter(True)
         # model danych dla Futures
         self._futuresModel = self.ListModel(list = dataParser.FUTURES_LIST)
-        self.futuresModel = QtGui.QSortFilterProxyModel()
+        self.futuresModel = QtCore.QSortFilterProxyModel()
         self.futuresModel.setSourceModel(self._futuresModel)
         self.futuresModel.setFilterCaseSensitivity(0)
         self.futuresModel.setDynamicSortFilter(True)
         
         """home """
-	try:
-		File = open("../GUIModule/save.wsf",'r')
-		valueList = cPickle.load(File)
-		self.home = Home(valueList[0],valueList[1],valueList[3],valueList[2],valueList[4])       
+        try:
+            File = open("../GUIModule/save.wsf",'r')
+            valueList = cPickle.load(File)
+            self.home = Home(valueList[0],valueList[1],valueList[3],valueList[2],valueList[4])       
         except:
-		self.home = Home()
-	self.tabs.addTab(self.home,"Home")
+            self.home = Home()
+
+	    self.tabs.addTab(self.home,"Home")
         self.rssWidget = RSSgui.RSSWidget(self.home)
         #os.chdir("../../WallStreetFighters/GUIModule")
         self.home.rssLayout.addWidget(self.rssWidget)
@@ -262,11 +263,11 @@ class GuiMainWindow(object):
         MainWindow.setCentralWidget(self.centralWidget)
 
 				
-        self.menubar = QtGui.QMenuBar(MainWindow)
+        self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 640, 25))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
-        self.statusbar = QtGui.QStatusBar(MainWindow)
+        self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
@@ -621,8 +622,8 @@ class GuiMainWindow(object):
             return 2
         def headerData(self, col, orientation, role):
             if orientation == QtCore.Qt.Horizontal and role == QtCore.Qt.DisplayRole:
-                return QtCore.QVariant(self.headerdata[col])
-            return QtCore.QVariant()
+                return self.headerdata[col]
+            return None
         
         def showHideRows(self, name):
             rowCount = len(self.list)
@@ -636,11 +637,11 @@ class GuiMainWindow(object):
         
         def data(self, index, role):
             if not index.isValid():
-                return QtCore.QVariant()
+                return None
             elif role == QtCore.Qt.WhatsThisRole:
                 return self.list[index.row()]
             elif role != QtCore.Qt.DisplayRole and role != 32 and role!= 33 and role!=34 :
-                return QtCore.QVariant()
+                return None
 
 
             if role == 32:
@@ -650,7 +651,7 @@ class GuiMainWindow(object):
                 
             if role == 34:
                 return self.list[index.row()][0] + ' ' + self.list[index.row()][1] + ' ' + self.list[index.row()][3]
-            return QtCore.QVariant(self.list[index.row()][index.column()])
+            return self.list[index.row()][index.column()]
                                         #if index.column() == 2:
                 #return QtCore.QVariant(self.list[index.row()][index.column()+2])
         
