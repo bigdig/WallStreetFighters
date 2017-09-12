@@ -355,6 +355,7 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 	try:
 		site = urllib2.urlopen(url)
 	except urllib2.URLError, ex:
+		print url
 		print "Something wrong happend! Check your internet connection!"
 		raise DataAPIException('Connection Error!')
 	csvString = site.read()

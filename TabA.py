@@ -42,10 +42,10 @@ class TabA(QtWidgets.QWidget):
         #która tworzy podstawowe elementy GUI
         tabUi(self,self.showLists)
         
-	self.hasChart = False #sprawdzenie czy istnieje 
-	self.currentChart = ""
-	self.chart = None
-	self.finObj = None
+        self.hasChart = False #sprawdzenie czy istnieje 
+        self.currentChart = ""
+        self.chart = None
+        self.finObj = None
 	
         self.setObjectName("tabA")
 
@@ -182,7 +182,7 @@ class TabA(QtWidgets.QWidget):
         strategy = Strategy(self.chart.data)
         text = strategy.analyze()
         self.analyzeTab = Analyze()
-        nameTab = str(self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+        nameTab = str(self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[0])
         nameTab = "Analyze " + nameTab
         self.parent().parent().parent().parent().gui.tabs.setCurrentIndex(self.parent().parent().parent().parent().gui.tabs.addTab(self.analyzeTab,nameTab))
         self.analyzeTab.textBrowser.setText(text)
@@ -655,48 +655,48 @@ class TabA(QtWidgets.QWidget):
             self.endDateEdit.setDate(self.startDateEdit.date())
     def addSymbolToCompareLine(self,a):
         if self.compareButton.isEnabled():
-            self.compareLineEdit.setText(self.compareLineEdit.text() +a.data(QtCore.Qt.WhatsThisRole).toStringList()[0]+ ' vs ')
+            self.compareLineEdit.setText(self.compareLineEdit.text() +a.data(QtCore.Qt.WhatsThisRole)[0]+ ' vs ')
 
     def paint2Chart(self):
-        index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+        index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[-1])
 
         if self.listName == "index":
             if dataParser.INDEX_LIST[index][2] == 'Yahoo':     
                 self.finObj = dataParser.createWithArchivesFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
 	    else:
                 self.finObj = dataParser.createWithArchivesFromStooq(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
-            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[0]
 
         if self.listName == "stock":
             if dataParser.STOCK_LIST[index][2] == 'Yahoo':
                 self.finObj = dataParser.createWithArchivesFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
-            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[0]
         
         if self.listName == "forex":
             self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
-            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[0]
 
         if self.listName == "bond":
             if dataParser.BOND_LIST[index][2] == 'Yahoo':
                 self.finObj = dataParser.createWithArchivesFromYahoo(dataParser.BOND_LIST[index][1],dataParser.BOND_LIST[index][0],'bond',dataParser.BOND_LIST[index][3],self.settings["step"])
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.BOND_LIST[index][1],dataParser.BOND_LIST[index][0],'bond',dataParser.BOND_LIST[index][3],self.settings["step"])
-            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[0]
         if self.listName == "resource":
             if dataParser.RESOURCE_LIST[index][2] == 'Yahoo':
                 self.finObj = dataParser.createWithArchivesFromYahoo(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
-            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[0]
             
         if self.listName == "futures":
             if dataParser.FUTURES_LIST[index][2] == 'Yahoo':
                 self.finObj = dataParser.createWithArchivesFromYahoo(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'futures',dataParser.FUTURES_LIST[index][3],self.settings["step"])
 	    else:
 		self.finObj = dataParser.createWithArchivesFromStooq(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'resource',dataParser.FUTURES_LIST[index][3],self.settings["step"])
-            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            self.currentChart = self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[0]
 
         self.chart = Chart(self, self.finObj)        
         self.cid = self.chart.mpl_connect('button_press_event', self.showChartsWithAllIndicators)
@@ -728,35 +728,35 @@ class TabA(QtWidgets.QWidget):
             print self.qModelIndex[k]
             print x 
             if x == "index":
-                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)[-1])
                 if dataParser.INDEX_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.INDEX_LIST[index][1],dataParser.INDEX_LIST[index][0],'index',dataParser.INDEX_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
             if x == "stock":
-                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)[-1])
                 if dataParser.STOCK_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.STOCK_LIST[index][1],dataParser.STOCK_LIST[index][0],'stock',dataParser.STOCK_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
             if x == "forex":
-                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)[-1])
                 if dataParser.FOREX_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.FOREX_LIST[index][1],dataParser.FOREX_LIST[index][0],'forex',dataParser.FOREX_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
             if x == "bond":
-                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)[-1])
                 if dataParser.BOND_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.BOND_LIST[index][1],dataParser.BOND_LIST[index][0],'bond',dataParser.BOND_LIST[index][3],self.settings["step"])
                 else:
                     finObj = dataParser.createWithArchivesFromStooq(dataParser.BOND_LIST[index][1],dataParser.BOND_LIST[index][0],'bond',dataParser.BOND_LIST[index][3],self.settings["step"])
                 self.finObj.append(finObj)
             if x == "resource":
-                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)[-1])
                 if dataParser.RESOURCE_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.RESOURCE_LIST[index][1],dataParser.RESOURCE_LIST[index][0],'resource',dataParser.RESOURCE_LIST[index][3],self.settings["step"])
                 else:
@@ -764,7 +764,7 @@ class TabA(QtWidgets.QWidget):
                 self.finObj.append(finObj)
                 
             if x == "futures":
-                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+                index = int (self.qModelIndex[k].data(QtCore.Qt.WhatsThisRole)[-1])
                 if dataParser.FUTURES_LIST[index][2] == 'Yahoo':
                     finObj = dataParser.createWithArchivesFromYahoo(dataParser.FUTURES_LIST[index][1],dataParser.FUTURES_LIST[index][0],'futures',dataParser.FUTURES_LIST[index][3],self.settings["step"])
                 else:
@@ -921,11 +921,11 @@ class TabA(QtWidgets.QWidget):
             drawTrend = self.drawTrendCheckBox.isChecked()
             #line width
             lineWidth = self.lineWidthSpinBox.value()
-            index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[-1])
+            index = int (self.qModelIndex.data(QtCore.Qt.WhatsThisRole)[-1])
         else:
             index = []
             for model in self.qModelIndex:
-                index.append( int (model.data(QtCore.Qt.WhatsThisRole).toStringList()[-1]))
+                index.append( int (model.data(QtCore.Qt.WhatsThisRole)[-1]))
         #step
         step = self.stepComboBox.currentText()
         #scale

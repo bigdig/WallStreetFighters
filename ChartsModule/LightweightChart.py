@@ -3,9 +3,9 @@ __author__="Andrzej Smoliński"
 __date__ ="$2012-03-31 18:57:55$"
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.ticker import *
-from qtpy import QtGui
+from qtpy import QtGui,QtWidgets
 
 class LightweightChart(FigureCanvas):
     """Jest to klasa do wyświetlania "lekkich" wykresów, tzn. takich które będą na

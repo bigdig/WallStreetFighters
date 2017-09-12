@@ -4,9 +4,9 @@ __date__ ="$2012-03-24 12:05:55$"
 
 from ChartData import ChartData
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.ticker import *
-from qtpy import QtGui
+from qtpy import QtGui,QtWidgets
 from matplotlib.lines import Line2D
 
 class CompareChart(FigureCanvas):

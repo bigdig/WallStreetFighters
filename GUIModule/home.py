@@ -237,9 +237,9 @@ class Home (QtWidgets.QWidget):
 
     def updateTable(self):
 	
-	self.mostList = self.updateThread.mostList
-	self.loserList = self.updateThread.loserList
-	self.gainerList = self.updateThread.gainerList
+        self.mostList = self.updateThread.mostList
+        self.loserList = self.updateThread.loserList
+        self.gainerList = self.updateThread.gainerList
 	
 
         ran = range(self.leftLayout.count())
@@ -256,11 +256,11 @@ class Home (QtWidgets.QWidget):
         self.addTable(self.loserList)
 	
     def updateHome(self):
-	self.updateTopList()
-	self.updateTable()
+        self.updateTopList()
+        self.updateTable()
 
     def startUpdating(self): 
-	self.updateThread.start()
+        self.updateThread.start()
 
     def tableClicked(self,a):
         if a.column() ==0:

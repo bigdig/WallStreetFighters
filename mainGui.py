@@ -174,27 +174,27 @@ class GuiMainWindow(object):
             if not isinstance(tabSettings['index'],list): #przywracanie taba z pojedynczym instrumentem
                 if tabSettings['finObjType'] == 'index':
                     qModelIndex =  self.indexModel.index(tabSettings['index'],0)
-                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole)[0])
                     self.newIndexTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'stock':
                     qModelIndex =  self.stockModel.index(tabSettings['index'],0)
-                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole)[0])
                     self.newStockTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'forex':
                     qModelIndex =  self.forexModel.index(tabSettings['index'],0)
-                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole)[0])
                     self.newForexTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'bond':
                     qModelIndex =  self.bondModel.index(tabSettings['index'],0)
-                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole)[0])
                     self.newBondTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'resources':
                     qModelIndex =  self.resourceModel.index(tabSettings['index'],0)
-                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole)[0])
                     self.newResourceTab(qModelIndex ,nameTab,tabSettings)
                 if tabSettings['finObjType'] == 'futures':
                     qModelIndex =  self.futuresModel.index(tabSettings['index'],0)
-                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole).toStringList()[0])
+                    nameTab = str(qModelIndex.data(QtCore.Qt.WhatsThisRole)[0])
                     self.newFuturesTab(qModelIndex ,nameTab,tabSettings)
             else:  # porównywanie chart
                 if tabSettings['finObjType'] == "index":
@@ -341,7 +341,7 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = listName,showLists = False)
         self.tabA1.analyzeButton.setCheckable(False)
         if not nameTab:
-            nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole)[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
     def newIndexTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
@@ -350,7 +350,7 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "index",showLists = False)
         #self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
-            nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            nameTab = self.tabA.indexListView.currentIndex().data(QtCore.Qt.WhatsThisRole)[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
     def newStockTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
@@ -361,7 +361,7 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "stock",showLists = False)
         #self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
-            nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            nameTab = self.tabA.stockListView.currentIndex().data(QtCore.Qt.WhatsThisRole)[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
     def newForexTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
@@ -371,7 +371,7 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "forex",showLists = False)
         #self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
-            nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            nameTab = self.tabA.forexListView.currentIndex().data(QtCore.Qt.WhatsThisRole)[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
     def newBondTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
@@ -382,7 +382,7 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "bond",showLists = False)
         #self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
-            nameTab = self.tabA.bondListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            nameTab = self.tabA.bondListView.currentIndex().data(QtCore.Qt.WhatsThisRole)[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
 
     def newResourceTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
@@ -393,7 +393,7 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "resource",showLists = False)
         #self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
-            nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            nameTab = self.tabA.resourceListView.currentIndex().data(QtCore.Qt.WhatsThisRole)[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
     def newFuturesTab(self,qModelIndex,nameTab = None,settings = None,tabType = None):
         if settings == None:
@@ -403,7 +403,7 @@ class GuiMainWindow(object):
         self.tabA1 = TabA(tabType,qModelIndex = qModelIndex,settings = settings,listName = "futures",showLists = False)
         #self.tabA1.analyzeButton.pressed.connect(self.newAnalyzeTab)
         if not nameTab:
-            nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole).toStringList()[0]
+            nameTab = self.tabA.futuresListView.currentIndex().data(QtCore.Qt.WhatsThisRole)[0]
         self.tabs.setCurrentIndex(self.tabs.addTab(self.tabA1,nameTab))
     
     def settings(self):
@@ -629,7 +629,7 @@ class GuiMainWindow(object):
             rowCount = len(self.list)
 
             for row in range(rowCount):
-                if self.index(row, 0).data(QtCore.Qt.WhatsThisRole).toStringList()[-2] == 'name':
+                if self.index(row, 0).data(QtCore.Qt.WhatsThisRole)[-2] == 'name':
                     self.setRowHidden(row, False)
                 else:
                     self.setRowHidden(row,True)

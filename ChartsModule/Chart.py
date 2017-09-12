@@ -6,13 +6,13 @@ from ChartData import ChartData
 from matplotlib.collections import LineCollection
 from matplotlib.collections import PatchCollection
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 # from matplotlib.finance import candlestick
 from matplotlib.ticker import *
 from matplotlib.textpath import TextPath
 from matplotlib.text import Text
 from numpy import *
-from qtpy import QtGui
+from qtpy import QtGui,QtWidgets
 from matplotlib.lines import Line2D
 from matplotlib.patches import Rectangle
 from TechAnalysisModule.candles import *
@@ -225,7 +225,7 @@ dla podanych danych. Domyślny rozmiar to 800x600 pixli"""
             lines2list.append(((i-0.3,self.data.open[i]),(i,self.data.open[i])))
             lines2list.append(((i,self.data.close[i]),(i+0.3,self.data.close[i])))   
         lines2=LineCollection(lines2list)
-        lines2.color('k')
+        #lines2.color('k')
         ax.add_collection(lines2)
     
     def setMainIndicator(self, type):
