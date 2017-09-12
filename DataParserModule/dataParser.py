@@ -11,6 +11,10 @@ import cStringIO
 import cPickle
 import threading
 
+'''一个简单的SINA数据客户端，主要使用requests开发'''
+import requests
+import execjs
+
 #ZMIENNE GLOBALNE
 REMEMBER_COUNT = 15
 
@@ -28,41 +32,29 @@ NASDAQ_HIST = []
 UPDATE_FLAG = False
 
 
-class FinancialObject(object):
-	"""Klasa definiująca obiekt finansowy (index,spółkę,surowiec,obligację, etc.), w której przechowywane będą archiwalne notowania i być może obliczone wskaźniki. """
-	
-	def __init__ (self, name, abbreviation, financialType, dataSource, detail = None,lastUpdate = datetime.date(1971,1,1)):
+class FinancialObject (object):
+	"""A class defining a financial object (index, company, raw material, bond, etc.) that stores historical quotes and possibly the indexes. """
+
+	def __init__ (self, name, abbreviation, financialType, dataSource, detail = None, lastUpdate = datetime.date (1971,1,1)):
 		self.name = name
-		self.abbreviation = abbreviation 
+		self.abbreviation = abbreviation
 		self.financialType = financialType
-		self.dataSource = dataSource
-		self.detail = detail #Informacja szczegółowa -> Index - kraj / Społka - index
-		self.lastUpdate = lastUpdate #informacja kiedy ostatnio aktualizowane byly dane z archiwum.
-		self.currentValue = [] #para wartość i data pobrania
-		self.previousValues = []  #lista w wartości z tego samego dnia ale pobranych wcześniej postaci: [datetime, value]
-		self.valuesDaily = [] #lista list w przypadku yahoo postaci [[date,open,high,low,close,volume,adj close], [date, ...], ...] 
-					# w przypadku Stooq bez adj close.
-		self.valuesWeekly = [] # jak wyżej tylko dla danych tygodniowych
-		self.valuesMonthly = [] # jak wyżej tylko dla danych miesięcznych
-		self.dailyUpdate = datetime.date(1971,1,1)
-		self.monthlyUpdate = datetime.date(1971,1,1)
-		self.weeklyUpdate = datetime.date(1971,1,1)
-
-	def getCurrentValue(self):
-		
-		global UPDATE_FLAG
-		UPDATE_FLAG = True	
-
-		"""Metoda aktualizująca dane dotyczące aktualnej wartości obiektu oraz przenosząca poprzednią wartość do listy poprzednich wartości"""
-		if self.dataSource == "Yahoo":
-			tmpObj = createWithCurrentValueFromYahoo(self.name, self.abbreviation, self.financialType, self.detail)
-		elif self.dataSource == "Stooq":
-			tmpObj = createWithCurrentValueFromStooq(self.name, self.abbreviation, self.financialType, self.detail)
-		self.previousValues = self.previousValues + self.currentValue
-		self.currentValue = tmpObj.currentValue
+		#self.dataSource = dataSource
+		self.dataSource = "Yahoo"
+		self.detail = detail # detailed information -> index - country / index - index
+		self.lastUpdate = lastUpdate #information when last updated data from archive.
+		self.currentValue = [] #para value and date of download
+		self.previousValues = [] #list in values ​​from same day but previously retrieved form: [datetime, value]
+		self.valuesDaily = [] #list for yahoo characters [[date, open, high, low, close, volume, adj close], [date, ...]
+		# for Stooq without adj close.
+		self.valuesWeekly = [] # as above only for weekly data
+		self.valuesMonthly = [] # as above only for monthly data
+		self.dailyUpdate = datetime.date (1971,1,1)
+		self.monthlyUpdate = datetime.date (1971,1,1)
+		self.weeklyUpdate = datetime.date (1971,1,1)
 
 	def updateArchive(self, timePeriod):
-		"""Metoda aktualizująca dane istniejącego obiektu. Tworzy nowy tymczasowy obiekt i kopiuje jego zawartość do obiektu 'self'. """
+		"""Method of updating data of an existing object. Creates a new temporary object and copies its contents to a 'self' object. """
 		day = datetime.timedelta(days=1)
 		lastUpdate = self.lastUpdate + day		
 
@@ -104,40 +96,6 @@ class FinancialObject(object):
 					else:
 						date = self.valuesMonthly[0][0]+day
 						tmpObj = createWithArchivesFromYahoo(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-					self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
-					self.monthlyUpdate = tmpObj.monthlyUpdate
-			elif self.dataSource == "Stooq":
-				if timePeriod == 'daily' and self.dailyUpdate != datetime.date.today():
-					UPDATE_FLAG = True
-					if self.valuesDaily == []: 
-						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-					elif self.valuesDaily[0][0] == datetime.date.today():
-						return
-					else:
-						date = self.valuesDaily[0][0]+day
-						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-					self.valuesDaily = self.valuesDaily + tmpObj.valuesDaily
-					self.dailyUpdate = tmpObj.dailyUpdate
-				elif timePeriod == 'weekly' and self.weeklyUpdate != datetime.date.today():
-					UPDATE_FLAG = True
-					if self.valuesWeekly == []: 
-						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-					elif self.valuesWeekly[0][0] == datetime.date.today():
-						return
-					else:
-						date = self.valuesWeekly[0][0]+day
-						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)		
-					self.valuesWeekly = self.valuesWeekly + tmpObj.valuesWeekly
-					self.weeklyUpdate = tmpObj.weeklyUpdate
-				elif timePeriod == 'monthly' and self.monthlyUpdate != datetime.date.today():
-					UPDATE_FLAG = True
-					if self.valuesMonthly == []: 
-						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod)	
-					elif self.valuesMonthly[0][0] == datetime.date.today():
-						return
-					else:
-						date = self.valuesMonthly[0][0]+day
-						tmpObj = createWithArchivesFromStooq(self.name, self.abbreviation, self.financialType, self.detail, timePeriod, date)				
 					self.valuesMonthly= self.valuesMonthly + tmpObj.valuesMonthly
 					self.monthlyUpdate = tmpObj.monthlyUpdate
 		except DataAPIException:
@@ -238,100 +196,67 @@ class DataAPIException(Exception):
 	def __str__(self):
 		return repr(self.value)
 
-def createWithCurrentValueFromYahoo(name, abbreviation, financialType, detail):
-	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony finance.yahoo"""
-	
-	"""
+
+def getDayBarsFromSina(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
+	"""# 从sina加载最新的Day数据"""
 	global HISTORY_LIST
 	global UPDATE_FLAG
 	if UPDATE_FLAG == False:
+		print isInHistory(abbreviation)
 		finObj = isInHistory(abbreviation)
 		if finObj != None:
-			finObj.getCurrentValue()
+			finObj.updateArchive(timePeriod)
 			return finObj
-	"""
 
-	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail)
+	currentDate = datetime.date.today()
 
-	url = "http://finance.yahoo.com/q?s="+abbreviation
+	finObj = FinancialObject(name,abbreviation, financialType, "Yahoo", detail, currentDate)
+	print "Pobieram: " + abbreviation
+
+	requests.adapters.DEFAULT_RETRIES = 5
+	session = requests.session()
+	session.keep_alive = False
+
 	try:
-		site = urllib2.urlopen(url)
-		print url
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException('Connection Error!')
-	pageSource = site.read()
-	if abbreviation[0] == '^':
-		pattern = '\\'+abbreviation.lower()+'">([0-9]*,*[0-9]+\.*[0-9]+)<'
-	else:	
-		pattern = abbreviation.lower()+'">([0-9]*,*[0-9]+\.*[0-9]+)<'
-	pattern = re.compile(pattern)
-	m = re.search(pattern,pageSource)
-	
-	timeNow = datetime.datetime.now()
 
-	pattern = 'Bid:</th>.*?>([0-9.]+)</span><small> x <.*?>([0-9]+)</span></sma.*?Ask:</th>.*?>([0-9.]+)</span><small> x <.*?>([0-9]+)'
-	pattern = re.compile(pattern)
-	
-	
-	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
-	m = re.search(pattern,pageSource)
+		symbol = "rb1801"
+		url = u'http://stock.finance.sina.com.cn/futures/api/json.php/InnerFuturesService.getInnerFuturesDailyKLine?symbol={0}'.format(symbol)
+		
+		print(u'从sina下载{0}的日K数据 {1}'.format(symbol, url))
 
-	"""
+		responses = execjs.eval(session.get(url).content.decode('gbk'))
+		dayVolume = 0
+
+		finObj.dailyUpdate = datetime.date.today()
+
+		for row in responses:
+			dataRow = [[parserStringToDate(row["date"]),float(row["open"]),float(row["high"]),float(row["low"]),float(row["close"]),int(row["volume"])]]
+			finObj.valuesDaily = finObj.valuesDaily + dataRow
+
+		if len(finObj.valuesDaily)>0:
+    			print(u'从sina读取了{0}条日线K数据'.format(len(finObj.valuesDaily)))
+		else:
+			print(u'从sina读取日线K数据失败')
+
+	except Exception as e:
+		print(u'加载Sina历史日线数据失败：'+str(e))
+
 	if UPDATE_FLAG == False:
-		if len(HISTORY_LIST) == REMEMBER_COUNT:
+    		if len(HISTORY_LIST) == REMEMBER_COUNT:
 			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
 			HISTORY_LIST[0] = finObj
 		else:
-			HISTORY_LIST = [finObj] + HISTORY_LIST
+			HISTORY_LIST += [finObj]
 	UPDATE_FLAG = False	
-	"""
-	return finObj
-
-def createWithCurrentValueFromStooq(name, abbreviation, financialType, detail):
-	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony Stooq.pl"""
-	"""
-	global HISTORY_LIST
-	global UPDATE_FLAG
-	if UPDATE_FLAG == False:
-		finObj = isInHistory(abbreviation)
-		if finObj != None:
-			finObj.getCurrentValue()
-			return finObj
-	"""
-
-	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
+	return finObj 
 	
-	url = "http://stooq.pl/q/?s="+abbreviation.lower()
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException('Connection Error!')
-	pageSource = site.read()
-	pattern = '_c[0-9]>([0-9]*,*[0-9]+\.*[0-9]+)<'
-	pattern = re.compile(pattern)
-	m = re.search(pattern,pageSource)
-	timeNow = datetime.datetime.now()
-	finObj.currentValue = [float(m.group(1).replace(',','')),timeNow]
-	pattern = '>Bid<.*?>([0-9.]*)</span></font>.*?>x([0-9.mgk]*)</span></font>.*?>Ask<.*?>([0-9.mgk]*)</span>.*?>x([0-9.mgk]*)</span>.*?Wolumen<br>.*?>([0-9.mgk]*)</span>.*?>Obrót<br>.*?>([0-9.mgk]*)</.*?>Transakcje<br><.*?>([0-9.mgk]*)<'
-	pattern = re.compile(pattern)
-	m = re.search(pattern,pageSource)
 
-	"""
-	if UPDATE_FLAG == False:
-		if len(HISTORY_LIST) == REMEMBER_COUNT:
-			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
-			HISTORY_LIST[0] = finObj
-		else:
-			HISTORY_LIST = [finObj] + HISTORY_LIST
-	UPDATE_FLAG = False	
-	"""
-	return finObj
+def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
+    return getDayBarsFromSina(name,abbreviation, financialType, detail, timePeriod)
 
 def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
 	"""Funkcja tworząca obiekt zawierający archiwalne dane pobrane ze strony finance.yahoo dotyczące obiektu zdefiniowanego w parametrach funkcji"""
-	
+	return getDayBarsFromSina(name,abbreviation, financialType, detail, timePeriod)
 	global HISTORY_LIST
 	global UPDATE_FLAG
 	if UPDATE_FLAG == False:
@@ -387,81 +312,7 @@ def createWithArchivesFromYahoo(name, abbreviation, financialType, detail, timeP
 	UPDATE_FLAG = False	
 	return finObj 
 
-def createWithArchivesFromStooq(name, abbreviation, financialType, detail, timePeriod, sinceDate = datetime.date(1971,1,1)):
-	"""Funkcja tworząca obiekt zawierający aktualną na daną chwilę wartość ze strony stooq.pl"""
-
-	global HISTORY_LIST
-	global UPDATE_FLAG
-	if UPDATE_FLAG == False:
-		finObj = isInHistory(abbreviation)
-		if finObj != None:
-			finObj.updateArchive(timePeriod)
-			return finObj
-
-	finObj = FinancialObject(name,abbreviation, financialType, "Stooq", detail)
-	currentDate = datetime.date.today()
-
-	try:
-		url= 'http://stooq.pl/q/d/?s='+abbreviation.lower()
-		opener = urllib2.build_opener()
-		opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-		site = opener.open(url)
-		x = site.info()['Set-Cookie']
-		opener = urllib2.build_opener()
-		opener.addheaders = [('User-agent', 'Mozilla/5.0'), ('Referer','http://stooq.pl/q/d/?s=08n'),('Host','stooq.p')]
-		opener.addheaders = [('Cookie', x)]
-		url2 = 'http://stooq.pl/q/d/l/?s='+abbreviation.lower()+'&d1='+parserDateToString(sinceDate)+'&d2='
-		url2 = url2 + parserDateToString(currentDate)+'&i=d'
-		if timePeriod == 'weekly':
-			url2 = url2.replace('&i=d', '&i=w')
-		elif timePeriod == 'monthly':
-			url2 = url2.replace('&i=d', '&i=m')
-		site = opener.open(url2)
-
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException('Connection Error!')
-	csvString = site.read()
-	csvString = cStringIO.StringIO(csvString)
-	dataCsv = csv.reader(csvString)
-	dataCsv.next()
-	if timePeriod == 'daily':
-		for row in dataCsv:
-			try:
-				if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
-					dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
-				else:
-					date = parserStringToDate(row[0])
-					dataRow=[[date,float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]
-				finObj.valuesDaily = finObj.valuesDaily + dataRow
-			except IndexError, ex:
-				pass
-	elif timePeriod == 'weekly':
-		for row in dataCsv:
-			if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
-				dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
-			else:
-				date = parserStringToDate(row[0])
-				dataRow = [[date,float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]	
-			finObj.valuesWeekly = finObj.valuesWeekly + dataRow
-	elif timePeriod == 'monthly':
-		for row in dataCsv:	
-			if financialType == 'forex' or financialType == 'bond' or financialType == 'resource':
-				dataRow = [[parserStringToDate(row[0]),float(row[1]),float(row[2]),float(row[3]),float(row[4])]]
-			else:
-				date = parserStringToDate(row[0])
-				dataRow = [[date,float(row[1]),float(row[2]),float(row[3]),float(row[4]),float(row[5])]]	
-			finObj.valuesMonthly = finObj.valuesMonthly + dataRow
-	if UPDATE_FLAG == False:
-		if len(HISTORY_LIST) == REMEMBER_COUNT:
-			HISTORY_LIST[1:REMEMBER_COUNT:1]=HISTORY_LIST[0:REMEMBER_COUNT-1:1]
-			HISTORY_LIST[0] = finObj
-		else:
-			HISTORY_LIST = [finObj] + HISTORY_LIST
-	UPDATE_FLAG = False	
-	return finObj
-	
-	 
+		 
 def parserStringToDate(string):
 	"""Funkcja zmieniająca ciąg znaków postaci "YYYY-MM-DD" na obiekt klasy datatime.date"""
 	string = string.split('-')
@@ -569,69 +420,6 @@ def loadData():
 	#loadHistory()
 
 
-def getAdvDec(date):
-	"""Funkcja dopisująca do bazy danych informacje o spadkach/wzrostach z bazy danych"""
-	list = []
-	url = 'http://unicorn.us.com/advdec/'+ str(date.year)+'/adU'+ parserDateToString(date) +'.txt'
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.HTTPError, ex:
-		if ex.code == 404:
-			print "Nie można pobrać danych. Rynki mogłybyć nie czynne w tym dniu."
-			raise DataAPIException('Connection Error!')
-		return
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException('Connection Error!')
-	pageSource = site.read()
-	pageSource = pageSource.replace(' ','')
-	csvString = cStringIO.StringIO(pageSource)
-	dataCsv = csv.reader(csvString)
-	dataCsv.next()
-	dataCsv.next()
- 	i = 0
-	for row in dataCsv:
-		if i == 0:
-			csvFile  = open('NYSE.csv', "ab")
-		elif i == 1:
-			csvFile  = open('AMEX.csv', "ab")
-		elif i == 2:
-			csvFile  = open('NASDAQ.csv',"ab")
-		csvFile.write(parserDateToString(date)+','+row[1]+','+row[2]+','+row[3]+','+row[4]+','+row[5]+','+row[6]+'\n')
-		i+=1
-
-def updateAdvDec():
-	size = len(AMEX_HIST)
-	last_date = AMEX_HIST[size-1][0]
-	day = datetime.timedelta(days=1)
-	if last_date + day == datetime.date.today():
-		return
-	else:	
-		now = last_date + day
-		while now != datetime.date.today():
-			getAdvDec(now)
-			now+=day
-
-def getAdvDecInPeriodOfTime(begin,end,index):
-	tmplist = []
-	day = datetime.timedelta(days=1)
-	if index == 'NYSE':
-		for row in NYSE_HIST:
-			if row[0] >= begin and row[0] <= end:
-				tmplist +=  [(str(row[0]),row[1],row[2],row[3],row[4],row[5],row[6])]
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int),('advv',int),('decv',int),('uncv',int)])
-	if index == 'AMEX':
-		for row in AMEX_HIST:
-			if row[0] >= begin and row[0] <= end:
-				tmplist +=  [(str(row[0]),row[1],row[2],row[3],row[4],row[5],row[6])]
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int),('advv',int),('decv',int),('uncv',int)])
-	if index == 'NASDAQ':
-		for row in NASDAQ_HIST:
-			if row[0] >= begin and row[0] <= end:
-				tmplist +=  [(str(row[0]),row[1],row[2],row[3],row[4],row[5],row[6])]
-		return np.array(tmplist,dtype = [('date','S10'),('adv',int),('dec',int),('unc',int),('advv',int),('decv',int),('uncv',int)])
-
-
 def isInHistory(abbreviation):
 	"""Funkcja sprawdzająca czy obiekt finansowy o podanym skrócie znajduje się w historii"""
 	for x in HISTORY_LIST:
@@ -668,150 +456,23 @@ class loadHistory(threading.Thread):
 def top5Volume():
 	"""Funkcja zwracajaca listę 5 spółek o najwyższym wolumenie"""
 	TOP_VOLUME = []
-	url = "http://finance.yahoo.com/actives?e=us"
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException("Connection ERROR!")
-	pageSource = site.read()
-	#pattern = '[A-Z]+">([A-Z]+)</a></b>.*?> ([0-9,]+)</span></td>'
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?"color:(.*?);.*?>([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
-	pattern = re.compile(pattern)
-	i = 0
-	for m in re.finditer(pattern,pageSource):
-		if i < 5:
-			if m.group(3) == '#cc0000':
-				TOP_VOLUME.append([m.group(1),m.group(2),'-' + m.group(4), '-' + m.group(5)])
-				i += 1
-			else:
-				TOP_VOLUME.append([m.group(1),m.group(2),m.group(4),m.group(5)])
-				i += 1
 	return TOP_VOLUME
 
 def top5Gainers():
 	"""Funkcja zwracajaca listę 5 spółek o najwiekszym wzroscie"""
 	TOP_GAINERS = []
-	url = "http://finance.yahoo.com/gainers?e=us"
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException("Connection ERROR!")
-	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
-	pattern = re.compile(pattern)
-	i = 0
-	for m in re.finditer(pattern,pageSource):
-		if i < 5:
-			TOP_GAINERS.append([m.group(1),m.group(2),m.group(3),m.group(4)])
-			i += 1
 	return TOP_GAINERS
 
 def top5Losers():
 	"""Funkcja zwracajaca listę 5 spółek o najwiekszym spadku"""
 	TOP_LOSERS = []
-	url = "http://finance.yahoo.com/losers?e=us"
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException("Connection ERROR!")
-	pageSource = site.read()
-	pattern = '[A-Z]+">([A-Z]+)</a></b>.*?([0-9.]*)</span></b>.*?;">([0-9.]*)<.*?> \(([0-9.]*%)\)</b>'
-	pattern = re.compile(pattern)
-	i = 0
-	for m in re.finditer(pattern,pageSource):
-		if i < 5:
-			TOP_LOSERS.append([m.group(1),m.group(2),'-' + m.group(3),'-' + m.group(4)])
-			i += 1
 	return TOP_LOSERS
 
 def getMostPopular():
 	"""Funkcja zwracająca aktualne wartości najbardziej popularnych obiektów"""
 	mostPopular = []
-	
-	url = "http://finance.yahoo.com/marketupdate/overview?u"
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException("Connection ERROR!")
-	pageSource = site.read()	
-	
-	mostPopular.append(mostPopularIndicesSearch('Dow', pageSource))
-	mostPopular.append(mostPopularIndicesSearch('Nasdaq', pageSource))
-	mostPopular.append(mostPopularIndicesSearch('S&amp;P 500', pageSource))
-
-	url = "http://finance.yahoo.com/"
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException("Connection ERROR!")
-	pageSource = site.read()
-
-	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
-	mostPopular.append(mostPopularPatternSearch('10-Year',pageSource))
-	mostPopular.append(mostPopularPatternSearch('Gold',pageSource))
-	mostPopular.append(mostPopularPatternSearch('Oil',pageSource))
-
-	mostPopular[2][0] = 'S&P 500' 
 	return mostPopular
 
-
-def mostPopularPatternSearch(keyWord,source):
-
-	pattern = '">' + keyWord + '<.*?">([0-9,.]*)<.*?>([0-9,.+-]*)<\/span.*?>([0-9.+-]*%)<'
-	pattern = re.compile(pattern, re.DOTALL)
-	m = re.search(pattern,source)
-	return [keyWord,m.group(1),m.group(2),m.group(3)]
-
-def mostPopularIndicesSearch(keyWord,pageSource):
-	
-	pattern = '">' + keyWord + '<.*?">([0-9,.]*)<\/span>.*?"color:(.*?);.*?>([0-9,.]*)<.*?> \(([0-9.]*%)\)<'
-	pattern = re.compile(pattern, re.DOTALL)
-	m = re.search(pattern,pageSource)
-	if m.group(2) == '#cc0000':
-		return [keyWord,m.group(1),'-' + m.group(3),'-' + m.group(4)]
-	else:
-		return [keyWord,m.group(1),'+' + m.group(3),'+' + m.group(4)]
-
-def getMostPopularCurrencies():
-	""" """
-	
-	url = "http://finance.yahoo.com/"
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException("Connection ERROR!")
-	pageSource = site.read()
-	
-	mostPopular = []
-	mostPopular.append(mostPopularPatternSearch('EUR/USD',pageSource))
-	mostPopular.append(mostPopularPatternSearch('USD/JPY',pageSource))
-	mostPopular.append(mostPopularPatternSearch('GBP/USD',pageSource))
-
-	return mostPopular
-
-def getMostPopularCommodities():
-	""" """
-	
-	url = "http://finance.yahoo.com/"
-	try:
-		site = urllib2.urlopen(url)
-	except urllib2.URLError, ex:
-		print "Something wrong happend! Check your internet connection!"
-		raise DataAPIException("Connection ERROR!")
-	pageSource = site.read()
-	
-	mostPopular = []
-	mostPopular.append(mostPopularPatternSearch('Gold',pageSource))
-	mostPopular.append(mostPopularPatternSearch('Silver',pageSource))
-	mostPopular.append(mostPopularPatternSearch('Copper',pageSource))
-	
-	return mostPopular
 
 def getDataToLightWeightChart(abbreviation, financialType, source):
 	global UPDATE_FLAG
@@ -819,10 +480,7 @@ def getDataToLightWeightChart(abbreviation, financialType, source):
 	ddays = datetime.timedelta(days=30)
 	since = today - ddays
 	UPDATE_FLAG = True
-	if source == "Stooq":
-		finObj = createWithArchivesFromStooq("", abbreviation, financialType, "", "daily", since)
-	else:
-	   	finObj = createWithArchivesFromYahoo("", abbreviation, financialType, "", "daily", since)
+	finObj = createWithArchivesFromYahoo("", abbreviation, financialType, "", "daily", since)
 	UPDATE_FLAG = False
 	return finObj
 	
